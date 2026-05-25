@@ -1,0 +1,34 @@
+name: CI - Main
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
+  ORG: openresilienceinitiative
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+
+    - name: Validate and build Node services
+      uses: ./.github/actions/node-validate-build
+      with:
+        node_version: '20'
+
+    - name: Create and Publish Docker image
+      uses: ./.github/actions/docker-build-push
+      with:
+        push_to_ghcr: true
+        image_name: oriso-status
+        github_token: ${{ secrets.GITHUB_TOKEN }}
